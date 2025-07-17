@@ -26,7 +26,7 @@ async function login(req, res) {
  * Register function
  */
 async function register(req, res) {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
     try {
         const checkQuery = 'SELECT * FROM users WHERE email = ?';
@@ -37,10 +37,14 @@ async function register(req, res) {
 
             }
 
-            const addQuery = `INSERT INTO users (id, email, password) VALUES (?, ?, ?)`;
-            db.all(addQuery, [uuid(), email, password], (err) => {
+            const addQuery = `INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)`;
+            db.all(addQuery, [uuid(), name, email, password], (err) => {
                 if (err) throw err;
-                return res.json({ status: 200, message: 'Register success!' })
+                return res.json({
+                    status: 200, message: 'Register success!', user: {
+                        name, email
+                    }
+                })
             });
         });
     } catch (err) {

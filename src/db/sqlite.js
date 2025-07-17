@@ -6,6 +6,7 @@ const db = new sqlite3.Database(path.resolve(__dirname, './callyn.db'));
 db.run(`
   CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
+    name TEXT,
     email TEXT,
     password TEXT
   )
