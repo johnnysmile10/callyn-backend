@@ -5,7 +5,7 @@ const { createVapiCampaign } = require("../utils/campaign");
 
 async function createCampaign(req, res) {
   const { user_id } = req.user;
-  const { agent, script, target_audience, customers, lead_name, voice_settings } = req.body;
+  const { agent, script, target_audience, customers, voice_settings } = req.body;
 
   const phones = await getPhoneNumbersByUserId(user_id);
   if (!phones || !phones.length) {
@@ -25,8 +25,8 @@ async function createCampaign(req, res) {
         `.trim();
 
   try {
-    const campaign_name = await getCampaignName(agent.businessContext, target_audience);
-    // const campaign_name = 'New campaign'
+    // const campaign_name = await getCampaignName(agent.businessContext, target_audience);
+    const campaign_name = 'New campaign'
 
     const assistant = await createAssistant(`${agent.name} agent`, { voice: voice_settings.languageConfig.voiceId, instructions });
     const campaign = await createVapiCampaign(campaign_name, phones[0].id, assistant.id, customers);
@@ -35,7 +35,7 @@ async function createCampaign(req, res) {
 
     return res.status(200).json({ message: 'success' });
   } catch (err) {
-    console.log(err.data.messages);
+    console.log(err);
     return res.status(500).send('Server error!');
   }
 }

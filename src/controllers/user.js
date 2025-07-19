@@ -41,9 +41,7 @@ async function register(req, res) {
             db.all(addQuery, [uuid(), name, email, password], (err) => {
                 if (err) throw err;
                 return res.json({
-                    status: 200, message: 'Register success!', user: {
-                        name, email
-                    }
+                    status: 200, message: 'Register success!'
                 })
             });
         });
