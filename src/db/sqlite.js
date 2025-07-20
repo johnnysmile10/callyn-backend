@@ -59,4 +59,24 @@ db.run(`
   )
 `);
 
+db.run(`
+  CREATE TABLE IF NOT EXISTS contacts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    number TEXT NOT NULL,
+    status TEXT
+  )
+`);
+
+db.run(`
+  CREATE TABLE IF NOT EXISTS calls (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    assistant_id TEXT NOT NULL,
+    call_id TEXT NOT NULL
+  )
+`)
+
 module.exports = db

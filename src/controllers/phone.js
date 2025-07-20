@@ -1,5 +1,5 @@
 const { getPhoneNumbersByUserId, createPhoneNumberByUserId } = require("../services/phone");
-const { getAssistantsByUserId } = require("../services/assistant");
+const { getFirstAgentByUserId } = require("../services/assistant");
 const { getAvailableNumbers, getIncomingNumbers, createVapiPhone, provisionNumber } = require("../utils/phone");
 
 async function createPhoneNumber(req, res) {
@@ -10,8 +10,8 @@ async function createPhoneNumber(req, res) {
     return res.status(400).send('Phone number is required to provision.');
   }
 
-  const assistants = await getAssistantsByUserId(user_id);
-  if (!assistants || !assistants.length) {
+  const firstAgent = await getFirstAgentByUserId(user_id);
+  if (!firstAgent) {
     return res.status(400).send('No available assistants.');
   }
 
@@ -23,7 +23,7 @@ async function createPhoneNumber(req, res) {
       await provisionNumber(phoneNumber);
     }
 
-    const vapiPhone = await createVapiPhone(phoneNumber, assistants[0].assistant_id);
+    const vapiPhone = await createVapiPhone(phoneNumber, firstAgent.assistant_id);
     await createPhoneNumberByUserId(user_id, vapiPhone);
     return res.status(200).json({ message: 'success' });
   } catch (err) {

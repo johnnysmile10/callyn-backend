@@ -2,6 +2,7 @@ const { getPhoneNumbersByUserId } = require('../services/phone');
 const { getCampaignsByUserId, createCampaignByUserId, getCampaignName } = require("../services/campaign");
 const { createAssistant } = require("../utils/assistant");
 const { createVapiCampaign } = require("../utils/campaign");
+const { createCallByUserId } = require('../services/call');
 
 async function createCampaign(req, res) {
   const { user_id } = req.user;
@@ -32,6 +33,9 @@ async function createCampaign(req, res) {
     const campaign = await createVapiCampaign(campaign_name, phones[0].id, assistant.id, customers);
 
     await createCampaignByUserId(user_id, campaign);
+    for (const call_id in campaign.calls) {
+      await createCallByUserId(user_id, { assistant_id: assistant.id, call_id });
+    }
 
     return res.status(200).json({ message: 'success' });
   } catch (err) {

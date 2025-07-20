@@ -26,4 +26,44 @@ async function getCallsByCampaigns(campaigns) {
   })
 }
 
-module.exports = { getCallsByCampaigns }
+async function getVapiCall(call_id) {
+  return new Promise(async resolve => {
+    try {
+      const call = await axios.get(`https://api.vapi.ai/call/${call_id}`, {
+        headers: {
+          Authorization: `Bearer ${VAPI_API_KEY}`
+        }
+      }).then(res => res.data);
+      resolve(call);
+    } catch (err) {
+      resolve(null);
+    }
+  });
+}
+
+async function createVapiCall(assistantId, phoneNumberId, customer) {
+  return new Promise(async resolve => {
+    try {
+      const call = await axios.post('https://api.vapi.ai/call', {
+        assistantId, phoneNumberId, customer
+      }, {
+        headers: {
+          Authorization: `Bearer ${VAPI_API_KEY}`
+        }
+      }).then(res => res.data);
+      resolve(call);
+    } catch (err) {
+      console.log(err);
+      resolve(null);
+    }
+  })
+}
+
+function getCallWithDuration(call) {
+  return {
+    ...call,
+    duration: call.messages.reduce((tot, m) => tot + m.duration || 0, 0) / 1000
+  }
+}
+
+module.exports = { getCallsByCampaigns, getCallWithDuration, getVapiCall, createVapiCall }

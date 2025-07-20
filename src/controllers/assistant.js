@@ -1,8 +1,7 @@
 const { createAssistant } = require("../utils/assistant");
-const { getAssistantsByUserId } = require("../services/assistant");
+const { getFirstAgentByUserId } = require("../services/assistant");
 
 const db = require('../db/sqlite');
-const { getPhoneNumbersByUserId } = require("../services/phone");
 
 async function createFirstAssistant(req, res) {
   const { user_id } = req.user;
@@ -114,11 +113,9 @@ async function getAssistant(req, res) {
   const { user_id } = req.user
 
   try {
-    const assistantData = await getAssistantsByUserId(user_id);
-    if (assistantData.length > 0) {
-      return res.status(200).json({ assistant: assistantData[0] });
-    }
-    return res.status(400).send('No assistants.');
+    const firstAgent = await getFirstAgentByUserId(user_id);
+    if (!firstAgent) return res.status(400).send('No available assistants.');
+    return res.status(200).json({ assistant: firstAgent });
   } catch (err) {
     console.error("DB error:", err.message);
     return res.status(500).send('Server error!');
