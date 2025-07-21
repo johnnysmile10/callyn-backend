@@ -57,7 +57,7 @@ async function getCampaignName(business_context, target_audience) {
     });
     try {
         const completion = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo', // Or 'gpt-4o', etc.
+            model: 'gpt-4o', // Or 'gpt-4o', etc.
             messages: [
                 {
                     role: 'user', content: `Generate a creative and compelling campaign name based on the following details:

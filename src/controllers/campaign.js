@@ -26,8 +26,8 @@ async function createCampaign(req, res) {
         `.trim();
 
   try {
-    // const campaign_name = await getCampaignName(agent.businessContext, target_audience);
-    const campaign_name = 'New campaign'
+    const campaign_name = await getCampaignName(agent.businessContext, target_audience);
+    // const campaign_name = 'New campaign'
 
     const assistant = await createAssistant(`${agent.name} agent`, { voice: voice_settings.languageConfig.voiceId, instructions });
     const campaign = await createVapiCampaign(campaign_name, phones[0].id, assistant.id, customers);
