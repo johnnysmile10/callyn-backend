@@ -62,7 +62,7 @@ async function createVapiCall(assistantId, phoneNumberId, customer) {
 function getCallWithDuration(call) {
   return {
     ...call,
-    duration: call.messages.reduce((tot, m) => tot + m.duration || 0, 0) / 1000
+    duration: (call.messages || []).reduce((tot, m) => tot + m.duration || 0, 0) / 1000
   }
 }
 
