@@ -54,7 +54,6 @@ db.run(`
     user_id TEXT NOT NULL,
     assistant_id TEXT NOT NULL,
     campaign_id TEXT NOT NULL,
-    lead_name, TEXT NOT NULL,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   )
 `);
