@@ -12,13 +12,13 @@ async function login(req, res) {
     const query = `SELECT * FROM users WHERE email = ?`;
     db.all(query, [email], (err, rows) => {
         if (err) {
-            return res.json({ status: 500, message: "DB error!" })
+            return res.status(500).send('Server error.');
         }
         if (rows.length > 0 && rows[0].password === password) {
             const token = jwt.sign({ user_id: rows[0].id }, process.env.JWT_SECRET_KEY);
-            return res.json({ status: 200, message: 'Login success!', token })
+            return res.status(200).json({ status: 200, token })
         }
-        return res.json({ status: 400, message: 'Email or password incorrect!' })
+        return res.status(400).json('Email or password incorrect!')
     })
 }
 
@@ -33,20 +33,19 @@ async function register(req, res) {
         db.all(checkQuery, [email], (err, checkRows) => {
             if (err) throw err;
             if (checkRows && checkRows.length > 0) {
-                return res.json({ status: 400, message: 'Email already exists.' });
-
+                return res.status(400).send('Email already exists.');
             }
 
             const addQuery = `INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)`;
             db.all(addQuery, [uuid(), name, email, password], (err) => {
                 if (err) throw err;
-                return res.json({
-                    status: 200, message: 'Register success!'
+                return res.status(200).json({
+                    message: 'Register success!'
                 })
             });
         });
     } catch (err) {
-        return res.json({ status: 500, message: 'Server error!' });
+        return res.status(500).send('Server error.');
     }
 }
 
