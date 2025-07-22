@@ -1,7 +1,7 @@
 const { getPhoneNumbersByUserId } = require('../services/phone');
-const { getCampaignsByUserId, createCampaignByUserId, getCampaignName } = require("../services/campaign");
+const { getCampaignsByUserId, createCampaignByUserId } = require("../services/campaign");
 const { createAssistant } = require("../utils/assistant");
-const { createVapiCampaign } = require("../utils/campaign");
+const { getCampaignName, createVapiCampaign } = require("../utils/campaign");
 const { createCallByUserId } = require('../services/call');
 
 async function createCampaign(req, res) {
