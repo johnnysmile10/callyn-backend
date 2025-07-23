@@ -1,14 +1,14 @@
-const { createAssistant } = require("../utils/assistant");
-const { getFirstAgentByUserId } = require("../services/assistant");
+const { createVapiAssistant, createInstructions, updateVapiAssistant } = require("../utils/assistant");
+const { getFirstAgentByUserId, updateAssistantByUserId } = require("../services/assistant");
 
 const db = require('../db/sqlite');
 
 async function createFirstAssistant(req, res) {
   const { user_id } = req.user;
   const {
-    name,
     voice,
     model,
+    business_name,
     industry,
     target_audience,
     main_goal,
@@ -25,32 +25,19 @@ async function createFirstAssistant(req, res) {
   } = req.body;
 
   try {
-    const instructions = `
-      Assistant Name: ${name || "My AI Agent"}
-      Industry: ${industry || "General"}
-      Target Audience: ${target_audience || "General audience"}
-      Main Goal: ${main_goal || "Provide assistance and support"}
-      Script: ${custom_script || "Default sales or support script"}
+    const agentName = `First agent for ${business_name}`
+    const instructions = createInstructions({ ...req.body, name: agentName });
 
-      Speaking Speed: ${speaking_speed || 1.0}x (Slower = 0.5x, Faster = 2.0x)
-      Enthusiasm Level: ${enthusiasm || 5} (1 = Calm, 10 = Energetic)
-
-      Small Talk Enabled: ${use_small_talk ? "Yes" : "No"}
-      Handle Objections: ${handle_objections ? "Yes" : "No"}
-
-      Tone: ${tone || "neutral"}
-      Formality: ${formality || "balanced"}
-    `.trim();
-
-    const assistant = await createAssistant(`First agent with ${name}`, { voice, instructions });
+    const assistant = await createVapiAssistant(agentName, { voice, instructions });
     const payload = {
       user_id,
       assistant_id: assistant.id,
-      name,
+      name: agentName,
       voice: assistant.voice?.voiceId || voice,
       model: assistant.model?.model || model,
       instructions,
       industry,
+      business_name,
       target_audience,
       main_goal,
       custom_script,
@@ -75,6 +62,7 @@ async function createFirstAssistant(req, res) {
         model,
         instructions,
         industry,
+        business_name,
         target_audience,
         main_goal,
         custom_script,
@@ -87,7 +75,7 @@ async function createFirstAssistant(req, res) {
         scriptMethod,
         websiteUrl,
         uploadedFile
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       Object.values(payload),
       function (err) {
         if (err) {
@@ -122,4 +110,20 @@ async function getAssistant(req, res) {
   }
 }
 
-module.exports = { createFirstAssistant, getAssistant }
+async function updateAssistant(req, res) {
+  const { user_id } = req.user;
+
+  try {
+    const assistant = await getFirstAgentByUserId(user_id);
+    const newAssistant = { ...assistant, ...req.body }
+    const instructions = createInstructions(newAssistant)
+    await updateAssistantByUserId(user_id, { ...newAssistant, instructions })
+    await updateVapiAssistant(assistant.assistant_id, { voice: newAssistant.voice, instructions });
+    return res.status(200).json({ data: newAssistant });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send('Server error!');
+  }
+}
+
+module.exports = { createFirstAssistant, getAssistant, updateAssistant }
